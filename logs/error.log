@@ -3,3 +3,10 @@
 2025-01-05T15:15:30.382Z ::1 - 404 GET /404 Not Found
 2025-01-05T15:15:54.302Z ::1 - 404 GET /er Not Found
 2025-01-16T14:55:00.028Z ::1 - 401 GET /admin Unauthorized
+2025-01-16T15:40:59.044Z ::1 - 401 POST /api/auth/login Unauthorized
+2025-01-16T15:40:59.876Z ::1 - 401 POST /api/auth/login Unauthorized
+2025-01-16T15:41:00.085Z ::1 - 401 POST /api/auth/login Unauthorized
+2025-01-16T15:41:00.265Z ::1 - 401 POST /api/auth/login Unauthorized
+2025-01-16T15:41:00.442Z ::1 - 401 POST /api/auth/login Unauthorized
+2025-01-16T15:41:01.134Z ::1 - 401 POST /api/auth/login Unauthorized
+2025-01-16T15:41:02.217Z ::1 - 401 POST /api/auth/login Unauthorized

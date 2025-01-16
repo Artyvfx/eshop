@@ -82,6 +82,34 @@ header {
     margin: 0.25rem;
 }
 
+.center {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.not-found {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px #db3453 solid;
+    background-color: #f6cecf;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    min-width: 300px;
+    max-width: 450px;
+    height: 200px;
+}
+
+.not-found p {
+    font-weight: 500;
+    margin: 1rem;
+}
+
 .product-card {
     background: white;
     border-radius: 8px;
@@ -424,12 +452,6 @@ input[type="file"] {
     margin-top: 0.5rem;
 }
 
-.center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .admin-user {
     display: flex;
     align-items: center;
@@ -447,4 +469,8 @@ input[type="file"] {
 .order-item img {
     margin-bottom: -0.25rem;
     margin-right: 0.33rem;
+}
+
+.move-up {
+    margin-top: -5rem;
 }
