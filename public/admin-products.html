@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Products</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <nav class="admin-nav">
+    <h1>Admin Dashboard</h1>
+    <ul>
+      <li><a href="/admin">Dashboard</a></li>
+      <li><a href="/admin/products">Products</a></li>
+      <li><a href="/admin/orders">Orders</a></li>
+      <li><a href="/admin/administrators">Administrators</a></li>
+      <li><a href="#" id="logout">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main class="admin-main">
+    <section id="product-list">
+      <h1>Products</h1>
+      <a href="/admin/product/new"><button class="btn-add"><img src="/icons/plus.svg" height="20px" width="20px" alt="plus">Add new item</button></a>
+      <ul id="products"></ul>
+    </section>
+  </main>
+</div>
+<script>
+  async function loadProducts() {
+    const response = await fetch('/api/product');
+    const products = await response.json();
+    const productList = document.getElementById('products');
+    productList.innerHTML = products.map(p => `
+        <li class="product-item">
+            ${p.name} | ${p.price} Kč |
+            <a href="/admin/product/edit/${p.id}" class="btn-edit"><img src="/icons/pencil.svg" height="20px" width="20px" alt="pencil">Edit</a>
+        </li>
+    `).join('');
+  }
+  loadProducts();
+
+  document.getElementById('logout').addEventListener('click', async (event) => {
+    event.preventDefault(); // Prevent default link behavior
+
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include', // Include cookies in the request
+      });
+
+      if (response.ok) {
+        // Redirect to the login page after successful logout
+        window.location.href = '/login';
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('An error occurred during logout:', error);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <div class="logo">Admin - Login</div>
+    </nav>
+</header>
+<main>
+    <section class="center">
+        <form class="login-form" id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+        <p id="error-message" class="error-message"></p>
+    </section>
+</main>
+
+<script>
+    document.getElementById("login-form").addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                document.getElementById('error-message').innerText = error.error || 'Invalid credentials.';
+                return;
+            }
+
+            window.location.href = '/admin';
+        } catch (error) {
+            console.error('Login failed:', error);
+            document.getElementById('error-message').innerText = 'An error occurred. Please try again later.';
+        }
+    });
+</script>
+
+</body>
+</html>

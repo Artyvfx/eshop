@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <nav class="admin-nav">
+    <h1>Admin Dashboard</h1>
+    <ul>
+      <li><a href="/admin">Dashboard</a></li>
+      <li><a href="/admin/products">Products</a></li>
+      <li><a href="/admin/orders">Orders</a></li>
+      <li><a href="/admin/administrators">Administrators</a></li>
+      <li><a href="#" id="logout">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main class="admin-main">
+    <h2>Dashboard</h2>
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <h3>Total Orders</h3>
+        <p id="order-count">Loading...</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Products</h3>
+        <p id="product-count">Loading...</p>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  async function loadDashboard() {
+    try {
+      // Fetch products
+      const productsResponse = await fetch('/api/product', {
+        method: 'GET',
+        credentials: 'include', // Ensure cookies are sent
+      });
+
+      if (!productsResponse.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const products = await productsResponse.json();
+      document.getElementById('product-count').innerText = products.length;
+
+      // Fetch orders
+      const ordersResponse = await fetch('/api/order', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!ordersResponse.ok) {
+        throw new Error('Failed to fetch orders');
+      }
+      const orders = await ordersResponse.json();
+      document.getElementById('order-count').innerText = orders.length;
+
+    } catch (error) {
+      console.error('Dashboard loading error:', error);
+      window.location.href = '/login';
+    }
+  }
+
+  loadDashboard();
+
+  document.getElementById('logout').addEventListener('click', async (event) => {
+    event.preventDefault(); // Prevent default link behavior
+
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include', // Include cookies in the request
+      });
+
+      if (response.ok) {
+        // Redirect to the login page after successful logout
+        window.location.href = '/login';
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('An error occurred during logout:', error);
+    }
+  });
+</script>
+
+</body>
+</html>

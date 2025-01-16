@@ -1,0 +1,5 @@
+2025-01-05T15:14:52.955Z ::1 - 404 GET /favicon.ico Not Found
+2025-01-05T15:15:25.141Z ::1 - 404 GET /api/order Not Found
+2025-01-05T15:15:30.382Z ::1 - 404 GET /404 Not Found
+2025-01-05T15:15:54.302Z ::1 - 404 GET /er Not Found
+2025-01-16T14:55:00.028Z ::1 - 401 GET /admin Unauthorized

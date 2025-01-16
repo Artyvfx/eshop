@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Product Form</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="admin-layout">
+    <nav class="admin-nav">
+        <h1>Admin Dashboard</h1>
+        <ul>
+            <li><a href="/admin">Dashboard</a></li>
+            <li><a href="/admin/products">Products</a></li>
+            <li><a href="/admin/orders">Orders</a></li>
+            <li><a href="/admin/administrators">Administrators</a></li>
+            <li><a href="#" id="logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="admin-main">
+        <h2 id="form-title">New Product</h2>
+        <form id="product-form" class="admin-form">
+            <div class="form-group">
+                <label for="name">Product Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="price">Price *</label>
+                <input type="number" id="price" name="price" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="image">Image *</label>
+                <input type="file" id="image" name="image" required>
+            </div>
+            <button type="submit" class="btn-primary">Save Product</button>
+        </form>
+    </main>
+</div>
+<script>
+    document.getElementById('product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Create a FormData object to handle the form data (including files)
+        const formData = new FormData();
+        formData.append('name', e.target.name.value);
+        formData.append('price', e.target.price.value);
+        formData.append('description', e.target.description.value);
+        formData.append('image', e.target.image.files[0]); // Handle file upload
+
+        try {
+            const response = await fetch('/api/product', {
+                method: 'POST',
+                body: formData, // Send form data as multipart/form-data
+            });
+
+            if (response.ok) {
+                alert('Product added!');
+                e.target.reset(); // Optionally reset the form after submission
+            } else {
+                alert('Error adding product');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error adding product');
+        }
+    });
+    document.getElementById('logout').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent default link behavior
+
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include', // Include cookies in the request
+            });
+
+            if (response.ok) {
+                // Redirect to the login page after successful logout
+                window.location.href = '/login';
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('An error occurred during logout:', error);
+        }
+    });
+</script>
+</body>
+</html>

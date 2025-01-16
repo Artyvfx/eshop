@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Edit Product</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="admin-nav">
+            <h1>Admin Dashboard</h1>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/products">Products</a></li>
+                <li><a href="/admin/orders">Orders</a></li>
+                <li><a href="/admin/administrators">Administrators</a></li>
+                <li><a href="#" id="logout">Logout</a></li>
+            </ul>
+        </nav>
+<main class="admin-main">
+    <section>
+        <h1>Edit Product</h1>
+        <form id="edit-product-form" class="admin-form">
+            <div class="form-group">
+            <label for="name">Product Name *</label>
+            <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description"></textarea>
+            </div>
+            <div class="form-group">
+            <label for="price">Price *</label>
+            <input type="number" id="price" name="price" required>
+            </div>
+            <div class="form-group">
+            <label for="image">Image *</label>
+            <input type="file" id="image" name="image">
+            </div>
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </form>
+    </section>
+</main>
+    </div>
+
+<script>
+    const productId = location.pathname.split('/').pop();
+
+    // Load product details
+    async function loadProduct() {
+        const response = await fetch(`/api/product/${productId}`);
+        const product = await response.json();
+        document.getElementById('name').value = product.name;
+        document.getElementById('description').value = product.description;
+        document.getElementById('price').value = product.price;
+        // Note: Image is not prefilled, as it's a file input.
+    }
+
+    document.getElementById('edit-product-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Create a FormData object
+        const formData = new FormData();
+        formData.append('name', e.target.name.value);
+        formData.append('price', e.target.price.value);
+        formData.append('description', e.target.description.value);
+
+        // Append the file if it exists
+        const fileInput = e.target.image;
+        if (fileInput.files.length > 0) {
+            formData.append('image', fileInput.files[0]);
+        }
+
+        try {
+            const response = await fetch(`/api/product/${productId}`, {
+                method: 'PUT',
+                body: formData, // Send as multipart/form-data
+            });
+
+            if (response.ok) {
+                alert('Product updated successfully!');
+                window.location.href = '/admin/products'; // Redirect if necessary
+            } else {
+                const error = await response.json();
+                alert('Error updating product: ' + (error.message || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Error updating product');
+        }
+    });
+
+    loadProduct();
+
+    document.getElementById('logout').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent default link behavior
+
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include', // Include cookies in the request
+            });
+
+            if (response.ok) {
+                // Redirect to the login page after successful logout
+                window.location.href = '/login';
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('An error occurred during logout:', error);
+        }
+    });
+</script>
+</body>
+</html>

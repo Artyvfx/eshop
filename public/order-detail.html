@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Products</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="admin-layout">
+    <nav class="admin-nav">
+        <h1>Admin Dashboard</h1>
+        <ul>
+            <li><a href="/admin">Dashboard</a></li>
+            <li><a href="/admin/products">Products</a></li>
+            <li><a href="/admin/orders">Orders</a></li>
+            <li><a href="/admin/administrators">Administrators</a></li>
+            <li><a href="#" id="logout" onclick="logout()">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main class="admin-main">
+        <h2>Order Details</h2>
+        <section class="order-card">
+            <div class="order-details" id="order-details"></div>
+        </section>
+    </main>
+
+</div>
+<script>
+    const orderId = location.pathname.split('/').pop();
+
+    async function loadOrder() {
+        const response = await fetch(`/api/order/${orderId}`);
+        const order = await response.json();
+
+        console.log(order);  // Log the order to see its structure
+        document.getElementById('order-details').innerHTML = `
+        <b>Order #${order.id}</b>
+        <b>Total: ${order.total} Kč</b>
+        <b>Items:</b>
+        <ul>
+            ${order.items.map(i => `<li>${i.product ? i.product.name : 'Product name missing'} - ${i.price} Kč</li>`).join('')}
+        </ul>
+    `;
+    }
+
+    loadOrder();
+
+    document.getElementById('logout').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent default link behavior
+
+        try {
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include', // Include cookies in the request
+            });
+
+            if (response.ok) {
+                // Redirect to the login page after successful logout
+                window.location.href = '/login';
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('An error occurred during logout:', error);
+        }
+    });
+</script>
+</body>
+</html>

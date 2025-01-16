@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Shop</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <div class="logo">E-Shop</div>
+        <div class="cart-icon" onclick="openCart()">
+            <img src="icons/shopping-bag.svg" height="20px" width="20px" alt="shopping-bag"><span id="cart-count">0</span>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <section class="products" id="product-list">
+    </section>
+</main>
+
+<div id="cart-modal" class="modal">
+    <div class="modal-content">
+        <img src="icons/x.svg" height="20px" width="20px" id="close" class="close" alt="close" onclick="closeCart()">
+        <h2>Your Cart</h2>
+        <div id="cart-items">
+        </div>
+        <form id="checkout-form">
+            <h3>Billing Information</h3>
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit" class="btn-primary">Place Order</button>
+        </form>
+    </div>
+</div>
+<script>
+    let cart = [];
+
+    async function loadProducts() {
+        const response = await fetch('/api/product');
+        const products = await response.json();
+        const productContainer = document.getElementById('product-list');
+        productContainer.innerHTML = products.map(p => `
+<div class="product">
+    <img class="product-image" src="${p.imageUrl}" alt="${p.name}">  <!-- Display the image using the URL -->
+    <h2>${p.name}</h2>
+    <p>${p.price} Kč</p>
+    <button onclick="addToCart(${p.id}, '${p.name}', ${p.price})">Přidat do košíku</button>
+</div>
+`).join('');
+    }
+    loadProducts();
+
+    // Add product to cart
+    function addToCart(id, name, price) {
+        // Check if the product is already in the cart
+        const existingProduct = cart.find(item => item.id === id);
+        if (existingProduct) {
+            existingProduct.quantity++; // Increment the quantity if it exists
+        } else {
+            // Add new product to the cart
+            cart.push({ id, name, price, quantity: 1 });
+        }
+        updateCart(); // Update the cart UI
+    }
+
+    // Update cart UI
+    function updateCart() {
+        const cartCount = document.getElementById('cart-count');
+        const cartItems = document.getElementById('cart-items');
+
+        // Update cart count
+        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+
+        // Update cart modal items
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<p>Your cart is empty.</p>';
+        } else {
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <span>${item.name} x ${item.quantity}</span>
+                    <span>${item.price * item.quantity} Kč</span>
+                    <button onclick="removeFromCart(${item.id})">Remove</button>
+                </div>
+            `).join('');
+        }
+    }
+
+    // Remove product from cart
+    function removeFromCart(id) {
+        cart = cart.filter(item => item.id !== id); // Remove the item from the cart
+        updateCart(); // Update the UI
+    }
+
+    // Open cart modal
+    function openCart() {
+        const modal = document.getElementById('cart-modal');
+        modal.style.display = 'block'; // Show the modal
+        updateCart(); // Ensure the cart is updated
+    }
+
+    // Close cart modal
+    function closeCart() {
+        const modal = document.getElementById('cart-modal');
+        modal.style.display = 'none'; // Hide the modal
+    }
+
+    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent form from refreshing the page
+
+        // Get user input from the form
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+
+        if (cart.length === 0) {
+            alert('Your cart is empty!');
+            return;
+        }
+
+        // Prepare order data
+        const items = cart.map(item => ({
+            productId: item.id,
+            quantity: item.quantity,
+            price: item.price,
+        }));
+
+        const orderData = {
+            name,
+            email,
+            items,
+            total: cart.reduce((total, item) => total + (item.price * item.quantity), 0), // Calculate total
+        };
+
+        // Send the order data to the backend API
+        try {
+            const response = await fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('Your order has been placed successfully!');
+                cart = []; // Clear the cart after successful order
+                updateCart(); // Update the cart UI
+                closeCart(); // Close the cart modal
+            } else {
+                alert('Failed to place order. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+            alert('An error occurred. Please try again.');
+        }
+    });
+</script>
+</body>
+</html>
